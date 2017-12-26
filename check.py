@@ -1,40 +1,57 @@
 #!/usr/bin/python3
 
 import io
+import os
 import sys
 import subprocess
 from subprocess import run, PIPE
 
 
 class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+    if os.name == 'posix':
+        HEADER = '\033[95m'
+        OKBLUE = '\033[94m'
+        OKGREEN = '\033[92m'
+        WARNING = '\033[93m'
+        FAIL = '\033[91m'
+        ENDC = '\033[0m'
+        BOLD = '\033[1m'
+        UNDERLINE = '\033[4m'
+    else:
+        HEADER = ''
+        OKBLUE = ''
+        OKGREEN = ''
+        WARNING = ''
+        FAIL = ''
+        ENDC = ''
+        BOLD = ''
+        UNDERLINE = ''
 
 
 def check():
     inputString = io.StringIO( yourInput )
 
     try:
-        goodProcess = run( [ './good' ], stdout = PIPE, input = yourInput, encoding = 'ascii' )
+        if os.name == 'nt':
+            windowsExt = '.exe'
+        else:
+            windowsExt = ''
+
+        goodProcess = run( [ './good' + windowsExt ], stdout = PIPE, input = yourInput, encoding = 'ascii' )
         goodOutput = io.StringIO( goodProcess.stdout )
 
-        badProcess = run( [ './' + fileName ], stdout = PIPE, input = yourInput, encoding = 'ascii' )
+        badProcess = run( [ './' + fileName + windowsExt ], stdout = PIPE, input = yourInput, encoding = 'ascii' )
         badOutput = io.StringIO( badProcess.stdout )
 
 
         for line in goodOutput:
             str = inputString.readline()
+            badLine = badOutput.readline()
 
-            if line == badOutput.readline():
-                print( bcolors.OKGREEN + '[DOBRZE] ' + bcolors.ENDC + '{}'.format( str ), end = '' )
+            if line == badLine:
+                print( bcolors.OKGREEN + '[DOBRZE] ' + bcolors.ENDC + '{}'.format( badLine ), end = '' )
             else:
-                print( bcolors.FAIL + '[ŹLE] ' + bcolors.ENDC + '{}'.format( str ), end = '' )
+                print( bcolors.FAIL + '[ŹLE] ' + bcolors.ENDC + '{} ->'.format( badLine.rstrip() ) + bcolors.OKGREEN + ' {}'.format( line ), end = '' )
 
         goodOutput.close()
         badOutput.close()
