@@ -66,23 +66,35 @@ except IndexError:
     print( bcolors.WARNING + 'Brak nazwy pliku! Ustawiam domyślnie: main' + bcolors.ENDC )
     fileName = 'main'
 
+tests = [ 'fill', 'mov_w', 'pop', 'put', 'set', 'set_l', 'sum', 'custom' ]
+
 print( bcolors.BOLD + 'ZADANIE F - TESTER' + bcolors.ENDC )
-print( '[1] Testuj z plików' )
-print( '[2] Własne' )
+print( '[1] Testuj wszystkie' )
+print( '[2] Wprowadź własne\n' )
 
-choice = input( ' >> ' )
+i = 3;
 
-if choice == '1':
-    tests = [ 'fill', 'mov_w', 'pop', 'put', 'set', 'set_l', 'sum' ]
+for test in tests:
+    print( '[{}] {}'.format( i, test ) )
+    i = i + 1
 
-    for i in tests:
-        inputFile = open( 'input_' + i + '.txt', 'r' )
-        yourInput = inputFile.read()
 
-        print( bcolors.ENDC + bcolors.BOLD + '\nSPRAWDZAM: ' + bcolors.ENDC + '{}'.format( i ) )
-        check()
+choice = int( input( ' >> ' ) )
 
-elif choice == '2':
+if choice == 1:
+
+    for test in tests:
+        try:
+            inputFile = open( 'input_' + test + '.txt', 'r' )
+            yourInput = inputFile.read()
+
+            print( bcolors.ENDC + bcolors.BOLD + '\nSPRAWDZAM: ' + bcolors.ENDC + '{}'.format( test ) )
+            check()
+
+        except FileNotFoundError:
+            print( bcolors.FAIL + 'Nie znaleziono pliku!' + bcolors.ENDC )
+
+elif choice == 2:
     command = ''
     yourInput = ''
 
@@ -90,7 +102,26 @@ elif choice == '2':
         command = input( '' )
         yourInput += command + '\n'
 
+    print( bcolors.ENDC + bcolors.BOLD + '\nSPRAWDZAM: ' + bcolors.ENDC )
     check()
+
+    choice = input( "Zapisać input? [y/n] " )
+
+    if choice == 'y':
+        customInputFile = open( 'input_custom.txt', 'w' )
+        customInputFile.write( yourInput )
+
+elif choice >= 3 and choice <= 10:
+    try:
+        inputFile = open( 'input_' + tests[ choice - 3 ] + '.txt', 'r' )
+        yourInput = inputFile.read()
+
+        print( bcolors.ENDC + bcolors.BOLD + '\nSPRAWDZAM: ' + bcolors.ENDC + '{}'.format( tests[ choice - 3 ] ) )
+        check()
+
+    except FileNotFoundError:
+        print( bcolors.FAIL + 'Nie znaleziono pliku!' + bcolors.ENDC )
+
 else:
     print( '>:(' )
 
