@@ -4,6 +4,7 @@ import io
 import os
 import sys
 import subprocess
+import time
 from subprocess import run, PIPE
 
 
@@ -37,10 +38,16 @@ def check():
         else:
             windowsExt = ''
 
+        startGood = time.time()
         goodProcess = run( [ './good' + windowsExt ], stdout = PIPE, input = yourInput, encoding = 'ascii' )
+        endGood = time.time()
+
         goodOutput = io.StringIO( goodProcess.stdout )
 
+        startBad = time.time()
         badProcess = run( [ './' + fileName + windowsExt ], stdout = PIPE, input = yourInput, encoding = 'ascii' )
+        endBad = time.time()
+
         badOutput = io.StringIO( badProcess.stdout )
 
 
@@ -51,7 +58,10 @@ def check():
             if line == badLine:
                 print( bcolors.OKGREEN + '[DOBRZE] ' + bcolors.ENDC + '{}'.format( badLine ), end = '' )
             else:
-                print( bcolors.FAIL + '[ŹLE] ' + bcolors.ENDC + '{} ->'.format( badLine.rstrip() ) + bcolors.OKGREEN + ' {}'.format( line ), end = '' )
+                print( bcolors.FAIL + '[ŹLE] ' + bcolors.ENDC + '{} ->'.format( badLine.rstrip() ) + bcolors.OKGREEN + ' {}'.format( line ) + bcolors.ENDC, end = '' )
+
+        print( "Czas: {}".format( endGood - startGood ) )
+        print( "Twój czas: {}".format( endBad - startBad ) )
 
         goodOutput.close()
         badOutput.close()
@@ -66,7 +76,7 @@ except IndexError:
     print( bcolors.WARNING + 'Brak nazwy pliku! Ustawiam domyślnie: main' + bcolors.ENDC )
     fileName = 'main'
 
-tests = [ 'fill', 'mov_w', 'pop', 'put', 'set', 'set_l', 'sum', 'custom' ]
+tests = [ 'set', 'put', 'pop', 'mov_w', 'set_l', 'fill', 'sum', 'custom' ]
 
 print( bcolors.BOLD + 'ZADANIE F - TESTER' + bcolors.ENDC )
 print( '[1] Testuj wszystkie' )
