@@ -5,6 +5,7 @@ import os
 import sys
 import subprocess
 import time
+import platform
 from subprocess import run, PIPE
 
 
@@ -31,21 +32,23 @@ class bcolors:
 
 def check():
     inputString = io.StringIO( yourInput )
-
+    
     try:
-        if os.name == 'nt':
-            windowsExt = '.exe'
-        else:
-            windowsExt = ''
+        if platform.system().lower() in ('windows'):
+            system_format = '.exe'
+        elif platform.system().lower() in ('darwin'):
+            system_format = 'mac' 
+        else: # linux
+            system_format = ''
 
         startGood = time.time()
-        goodProcess = run( [ './good' + windowsExt ], stdout = PIPE, input = yourInput, encoding = 'ascii' )
+        goodProcess = run( [ './good' + system_format ], stdout = PIPE, input = yourInput, encoding = 'ascii' )
         endGood = time.time()
 
         goodOutput = io.StringIO( goodProcess.stdout )
 
         startBad = time.time()
-        badProcess = run( [ './' + fileName + windowsExt ], stdout = PIPE, input = yourInput, encoding = 'ascii' )
+        badProcess = run( [ './' + fileName], stdout = PIPE, input = yourInput, encoding = 'ascii' )
         endBad = time.time()
 
         badOutput = io.StringIO( badProcess.stdout )
@@ -92,13 +95,12 @@ for test in tests:
 choice = int( input( ' >> ' ) )
 
 if choice == 1:
-
     for test in tests:
         try:
-            inputFile = open( 'input_' + test + '.txt', 'r' )
+            print( bcolors.ENDC + bcolors.BOLD + '\nSPRAWDZAM: ' + bcolors.ENDC + '{}'.format( test ) )
+            inputFile = open( 'input_' + test + '.txt', 'r' ) 
             yourInput = inputFile.read()
 
-            print( bcolors.ENDC + bcolors.BOLD + '\nSPRAWDZAM: ' + bcolors.ENDC + '{}'.format( test ) )
             check()
 
         except FileNotFoundError:
@@ -123,10 +125,9 @@ elif choice == 2:
 
 elif choice >= 3 and choice <= 10:
     try:
+        print( bcolors.ENDC + bcolors.BOLD + '\nSPRAWDZAM: ' + bcolors.ENDC + '{}'.format( tests[ choice - 3 ] ) )
         inputFile = open( 'input_' + tests[ choice - 3 ] + '.txt', 'r' )
         yourInput = inputFile.read()
-
-        print( bcolors.ENDC + bcolors.BOLD + '\nSPRAWDZAM: ' + bcolors.ENDC + '{}'.format( tests[ choice - 3 ] ) )
         check()
 
     except FileNotFoundError:
